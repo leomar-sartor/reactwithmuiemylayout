@@ -16,32 +16,35 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { Card } from "@mui/material";
 
 const drawerWidth = 240;
 
-const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
-  ({ theme, open }) => ({
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    transition: theme.transitions.create("margin", {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen
-    }),
+const Main = styled("main")(({ theme, open, screenmd }) => ({
+  flexGrow: 1,
+  padding: theme.spacing(3),
+  transition: theme.transitions.create("margin", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen
+  }),
+  ...(!screenmd && {
     marginLeft: `-${drawerWidth}px`,
-    marginTop: "60px",
-    ...(open && {
-      transition: theme.transitions.create("margin", {
-        easing: theme.transitions.easing.easeOut,
-        duration: theme.transitions.duration.enteringScreen
-      }),
-      marginLeft: 0
-    })
+    marginTop: "64px"
+  }),
+  ...(screenmd && {
+    marginTop: "48px"
+  }),
+  ...(open && {
+    transition: theme.transitions.create("margin", {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen
+    }),
+    marginLeft: 0
   })
-);
+}));
 
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open"
-  })(({ theme, open }) => ({
+const AppBar = styled(MuiAppBar)(({ theme, open }) => ({
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen
@@ -59,6 +62,9 @@ const AppBar = styled(MuiAppBar, {
 
 export default function PersistentDrawerLeft() {
   const theme = useTheme();
+
+  const smDown = useMediaQuery(theme.breakpoints.down("sm"));
+
   const [open, setOpen] = React.useState(false);
 
   const handleDrawer = () => {
@@ -67,8 +73,7 @@ export default function PersistentDrawerLeft() {
 
   return (
     <Box sx={{ display: "flex" }}>
-      
-      <AppBar position="fixed" open={open}>
+      <AppBar position="fixed" open={open} elevation={4}>
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
             MEU APP
@@ -91,11 +96,17 @@ export default function PersistentDrawerLeft() {
           flexShrink: 0,
           "& .MuiDrawer-paper": {
             width: drawerWidth,
-            backgroundColor: "transparent",
-            marginTop: "60px;"
+            ...(!smDown && {
+              backgroundColor: "transparent",
+              marginTop: "64px;",
+              borderRight: "none"
+            }),
+            ...(smDown && {
+              marginTop: "48px;"
+            })
           }
         }}
-        variant="persistent"
+        variant={smDown ? "temporary" : "persistent"}
         anchor="left"
         open={open}
       >
@@ -126,7 +137,10 @@ export default function PersistentDrawerLeft() {
         </List>
       </Drawer>
 
-      <Main open={open}>
+      <Main open={open} screenmd={smDown}>
+        <Card>
+          <Typography paragraph>Teste</Typography>
+        </Card>
         <Typography paragraph>
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua. Rhoncus
@@ -157,7 +171,6 @@ export default function PersistentDrawerLeft() {
           posuere sollicitudin aliquam ultrices sagittis orci a.
         </Typography>
       </Main>
-
     </Box>
   );
 }
